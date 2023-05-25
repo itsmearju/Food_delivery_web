@@ -5,8 +5,8 @@ from django.views import View
 
 class Index(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'delivery_app/index.html')
+        return render(request, 'customer/index.html')
     
 class About(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'delivery_app/about.html')
+        return render(request, 'customer/about.html')

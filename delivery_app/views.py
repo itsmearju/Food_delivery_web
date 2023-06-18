@@ -1,6 +1,8 @@
+
 from django.shortcuts import render
 from django.views import View
 from .models import MenuItem, Category, OrderModel
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -28,6 +30,13 @@ class Order(View):
         return render(request, 'customer/order.html', context)
     
     def post(self, request, *args, **kwargs):
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        street = request.POST.get('street')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        zip_code = request.POST.get('zip')
+
         order_items = {
             'items': []
         }
@@ -51,9 +60,28 @@ class Order(View):
             price += item['price']
             item_ids.append(item['id'])
 
-        order = OrderModel.objects.create(price=price)
+        order = OrderModel.objects.create(
+            price=price,
+            name=name,
+            email=email,
+            street=street,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            )
         order.items.add(*item_ids)
-
+        
+        #after done, send confirm email to the user
+        body =  ('Thank you for your order! Your food is being made and will be delivered soon\n'
+                 f'Your total: {price}\n'
+                 'Thank you again for your order')
+        send_mail(
+            'Thank you for your order',
+            body,
+            'example@example.com',
+            [email],
+            fail_silently=False
+        )
         context = {
             'items': order_items['items'],
             'price': price
